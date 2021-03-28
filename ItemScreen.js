@@ -74,8 +74,8 @@ const ItemScreen = ({ navigation, route }) => {
   };
 
   const speak = () => {
-      const thingToSay = chompResponse.items[0].name + "Do not consume if you are allergic to the following" + allergens;
-      Speech.speak(thingToSay);
+      const thingToSay = chompResponse.items[0].name + ". Do not consume if you are allergic to the following: " + allergens;
+      Speech.speak(thingToSay, {language: 'en-US', rate: 0.75, loop: false});
     };
 
   useEffect(() => {
