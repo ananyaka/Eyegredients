@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, StyleSheet } from "react-native";
+import { ScrollView, Text, StyleSheet, View, Button } from "react-native";
 import Constants from "expo-constants";
 import { Table, Row, Rows } from "react-native-table-component";
+import * as Speech from "expo-speech";
 
 const styles = StyleSheet.create({
   container: {
@@ -45,6 +46,7 @@ const tableHead = ["Nutrient", "Amount per 100g"];
 
 const ItemScreen = ({ navigation, route }) => {
   const { barcodeNumber } = route.params;
+  console.log(barcodeNumber);
   const [chompResponse, setChompResponse] = useState();
   const [tableData, setTableData] = useState([]);
   const [ingredients, setIngredients] = useState("");
@@ -54,6 +56,7 @@ const ItemScreen = ({ navigation, route }) => {
       `https://chompthis.com/api/v2/food/branded/barcode.php?api_key=${Constants.manifest.extra.chompApiKey}&code=${barcodeNumber}`
     );
     let json = await response.json();
+    console.log(json);
     const nutrientData = [];
     json.items[0].nutrients.map((nutrient) => {
       if (nutrient.per_100g > 0) {
@@ -69,6 +72,17 @@ const ItemScreen = ({ navigation, route }) => {
     setTableData(nutrientData);
     setChompResponse(json);
   };
+
+  const speak = () => {
+      const thingToSay = chompResponse.items[0].name + "Do not consume if you are allergic to the following" + allergens;
+      Speech.speak(thingToSay);
+    };
+
+  useEffect(() => {
+    if (chompResponse) {
+      speak()
+    }
+  }, [chompResponse])
 
   useEffect(() => {
     if (barcodeNumber) {
