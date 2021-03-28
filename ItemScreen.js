@@ -51,6 +51,7 @@ const ItemScreen = ({ navigation, route }) => {
   const [tableData, setTableData] = useState([]);
   const [ingredients, setIngredients] = useState("");
   const [allergens, setAllergens] = useState("");
+  const [spokenOnce, setSpokenOnce] = useState(false);
   const getArticlesFromApi = async () => {
     let response = await fetch(
       `https://chompthis.com/api/v2/food/branded/barcode.php?api_key=${Constants.manifest.extra.chompApiKey}&code=${barcodeNumber}`
@@ -74,8 +75,11 @@ const ItemScreen = ({ navigation, route }) => {
   };
 
   const speak = () => {
-      const thingToSay = chompResponse.items[0].name + ". Do not consume if you are allergic to the following: " + allergens;
-      Speech.speak(thingToSay, {language: 'en-US', rate: 0.75, loop: false});
+      const thingToSay = chompResponse.items[0].name + ". The nutrients per 100gm are:" + tableData + ". Ingredients: " + ingredients +  ". Allergens " + allergens;
+      if(!spokenOnce) {
+      Speech.speak(thingToSay, {language: 'en-US', rate: 0.75, onLooping: false});
+      }
+      setSpokenOnce(true);
     };
 
   useEffect(() => {
