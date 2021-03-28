@@ -66,6 +66,7 @@ const ItemScreen = ({ navigation, route }) => {
     });
     setIngredients(json.items[0].ingredient_list.join(", "));
     setAllergens(json.items[0].allergens.join(", "));
+    console.log(json.items[0].allergens);
     setTableData(nutrientData);
     setChompResponse(json);
   };
@@ -104,7 +105,7 @@ const ItemScreen = ({ navigation, route }) => {
           {`Ingredients: ${ingredients}`}
         </Text>
         <Text style={styles.ingredientText}>
-          {`Ingredients: ${ingredients}`}
+          {`Allergens: ${allergens}`}
         </Text>
       </View>
     );

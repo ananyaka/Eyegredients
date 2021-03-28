@@ -29,6 +29,7 @@ const CameraScreen = ({navigation}) => {
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
+        barCodeTypes={[BarCodeScanner.Constants.BarCodeType.upc_a]}
       />
       {scanned}
     </View>
