@@ -1,88 +1,39 @@
-import React, { Component } from 'react';
-import { Button, Text, View } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
-class CameraScreen extends Component {
+export default function App() {
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
 
-  constructor(props) {
-    super(props);
-    this.camera = null;
-    this.barcodeCodes = [];
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
 
-    this.state = {
-      camera: {
-        type: RNCamera.Constants.Type.back,
-  flashMode: RNCamera.Constants.FlashMode.auto,
-      }
-    };
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
   }
 
-  onBarCodeRead(scanResult) {
-    console.warn(scanResult.type);
-    console.warn(scanResult.data);
-    if (scanResult.data != null) {
-  if (!this.barcodeCodes.includes(scanResult.data)) {
-    this.barcodeCodes.push(scanResult.data);
-    console.warn('onBarCodeRead call');
-  }
-    }
-    return;
-  }
-
-  async takePicture() {
-    if (this.camera) {
-      const options = { quality: 0.5, base64: true };
-      const data = await this.camera.takePictureAsync(options);
-      console.log(data.uri);
-    }
-  }
-
-  pendingView() {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'lightgreen',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text>Waiting</Text>
-      </View>
-    );
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <RNCamera
-            ref={ref => {
-              this.camera = ref;
-            }}
-            defaultTouchToFocus
-            flashMode={this.state.camera.flashMode}
-            mirrorImage={false}
-            onBarCodeRead={this.onBarCodeRead.bind(this)}
-            onFocusChanged={() => {}}
-            onZoomChanged={() => {}}
-            permissionDialogTitle={'Permission to use camera'}
-            permissionDialogMessage={'We need your permission to use your camera phone'}
-            style={styles.preview}
-            type={this.state.camera.type}
-        />
-        <View style={[styles.overlay, styles.topOverlay]}>
-    <Text style={styles.scanScreenMessage}>Please scan the barcode.</Text>
-  </View>
-  <View style={[styles.overlay, styles.bottomOverlay]}>
-          <Button
-            onPress={() => { console.log('scan clicked'); }}
-            style={styles.enterBarcodeManualButton}
-            title="Enter Barcode"
-           />
-  </View>
-      </View>
-    );
-  }
+  return (
+    <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+    </View>
+  );
 }
 
 const styles = {
@@ -128,5 +79,3 @@ const styles = {
     justifyContent: 'center'
   }
 };
-
-export default CameraScreen;
