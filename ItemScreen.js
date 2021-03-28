@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { ScrollView, Text, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import { Table, Row, Rows } from "react-native-table-component";
 
@@ -66,18 +66,19 @@ const ItemScreen = ({ navigation, route }) => {
     });
     setIngredients(json.items[0].ingredient_list.join(", "));
     setAllergens(json.items[0].allergens.join(", "));
-    console.log(json.items[0].allergens);
     setTableData(nutrientData);
     setChompResponse(json);
   };
 
   useEffect(() => {
-    getArticlesFromApi();
-  }, [route]);
+    if (barcodeNumber) {
+      getArticlesFromApi();
+    }
+  }, [route, barcodeNumber]);
 
   if (chompResponse)
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text style={styles.baseText}>
           <Text
             style={styles.titleText}
@@ -104,10 +105,8 @@ const ItemScreen = ({ navigation, route }) => {
         <Text style={styles.ingredientText}>
           {`Ingredients: ${ingredients}`}
         </Text>
-        <Text style={styles.ingredientText}>
-          {`Allergens: ${allergens}`}
-        </Text>
-      </View>
+        <Text style={styles.ingredientText}>{`Allergens: ${allergens}`}</Text>
+      </ScrollView>
     );
   else return null;
 };
